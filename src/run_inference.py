@@ -4,6 +4,7 @@ import os
 import sys
 import traceback
 import tempfile
+import argparse
 
 # Third party imports
 import numpy as np
@@ -83,10 +84,13 @@ def run_job(image_bytes):
         raise
 
 
-def main():
+def main(input_bytes):
     print("Starting inference...")
 
-    file_bytes = os.environ.get("INPUT", "")
+    file_bytes = input_bytes
+    if input_bytes is None:
+        file_bytes = os.environ["INPUT"]
+
 
     output = {"input": file_bytes, "status": "error"}
 
@@ -118,4 +122,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input", type=str, required=True)
+    args = parser.parse_args()
+    input_bytes = args.input
+    main(input_bytes)
