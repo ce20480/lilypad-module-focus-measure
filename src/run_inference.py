@@ -47,13 +47,13 @@ def run_job(image_bytes):
         raise
 
 
-def main(input_bytes):
+def main():
     print("Starting inference...")
 
-    file_bytes = input_bytes
-    if input_bytes is None:
-        file_bytes = os.environ["INPUT"]
+    file_bytes = os.environ.get("INPUT")
 
+    if file_bytes is None:
+        raise ValueError("INPUT environment variable is not set")
 
     output = {"input": file_bytes, "status": "error"}
 
@@ -80,7 +80,4 @@ def main(input_bytes):
 
 
 if __name__ == "__main__":
-    with open("A.jpg", "rb") as img_file:
-        image_bytes = img_file.read()
-
-    main(image_bytes)
+    main()
