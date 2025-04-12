@@ -65,4 +65,5 @@ if __name__ == "__main__":
 
     # Decode and test blur detection
     # decoded_bytes = base64.b64decode(encoded)
-    print(variance_of_laplacian_from_bytes(image_bytes))
+    # print(variance_of_laplacian_from_bytes(image_bytes))
+    print(image_bytes)
