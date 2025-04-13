@@ -31,9 +31,28 @@ def run_job(image_bytes):
     """Combine input file with working directory to get the full path"""
     try:
         focus_measure = variance_of_laplacian_from_bytes(image_bytes)
+
+        # Check if focus measure meets threshold
+        is_blurry = focus_measure < 100
+        
+        if is_blurry:
+            return {
+                "success": False,
+                "message": "Image is too blurry",
+                "focus_measure": focus_measure,
+                "threshold": 100
+            }
+        
+        # Calculate normalized score (higher is better)
+        # Scale between 0-1 with 1 being perfect focus
+        normalized_score = min(1.0, focus_measure / (100 * 2))
+        
         output = {
+            "success": True,
+            "message": "Image has acceptable focus",
             "focus_measure": focus_measure,
-            "status": "success",
+            "score": normalized_score,
+            "threshold": 100
         }
 
         return output
