@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import traceback
+import base64
 
 # Third party imports
 import numpy as np
@@ -52,8 +53,15 @@ def main():
 
     file_bytes = os.environ.get("INPUT")
 
+
     if file_bytes is None:
         raise ValueError("INPUT environment variable is not set")
+
+    # Decode the base64 encoded image
+    try:
+        file_bytes = base64.b64decode(file_bytes)
+    except Exception as e:
+        raise ValueError(f"Failed to decode base64 image: {str(e)}")
 
     output = {"input": file_bytes, "status": "error"}
 
