@@ -9,28 +9,28 @@ import base64
 import numpy as np
 import cv2
 
-def variance_of_laplacian_from_bytes(image_bytes):
-    try: 
-        # Convert bytes to a numpy array
-        nparr = np.frombuffer(image_bytes, np.uint8)
-        # Decode image
-        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        # Process the image
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        fm = cv2.Laplacian(gray, cv2.CV_64F).var()
-        return fm
+def variance_of_laplacian_from_path(image_path):
+    # Check if file exists
+    if not os.path.isfile(image_path):
+        raise FileNotFoundError(f"Image file {image_path} not found")
+    
+    # Load the image and check if it was loaded successfully
+    cv2_image = cv2.imread(image_path)
+    if cv2_image is None:
+        raise ValueError(f"Failed to load image {image_path}. Check if it's a valid image format.")
         
-    except Exception as e:
-        print(f"Error processing image: {e}")
-        raise ValueError(f"Failed to process image bytes: {str(e)}")
+    # compute the Laplacian of the image and then return the focus measure
+    gray = cv2.cvtColor(cv2_image, cv2.COLOR_BGR2GRAY)
+    fm = cv2.Laplacian(gray, cv2.CV_64F).var()
+    return fm
 
-def run_job(image_bytes):
+def run_job(image_path):
     """
     Run the job
     """
     """Combine input file with working directory to get the full path"""
     try:
-        focus_measure = variance_of_laplacian_from_bytes(image_bytes)
+        focus_measure = variance_of_laplacian_from_path(image_path)
 
         # Check if focus measure meets threshold
         is_blurry = focus_measure < 100
@@ -70,23 +70,16 @@ def run_job(image_bytes):
 def main():
     print("Starting inference...")
 
-    file_bytes = os.environ.get("INPUT")
+    file_path = os.environ.get("INPUT")
 
 
-    if file_bytes is None:
+    if file_path is None:
         raise ValueError("INPUT environment variable is not set")
     
-    # check if file bytes is actually bytes
-    if not isinstance(file_bytes, str):
-        try:
-            file_bytes = base64.b64decode(file_bytes)
-        except Exception as e:
-            raise ValueError(f"Failed to decode base64 image: {str(e)}")
-
-    output = {"input": file_bytes, "status": "error"}
+    output = {"input": file_path, "status": "error"}
 
     try:
-        output = run_job(file_bytes)
+        output = run_job(file_path)
 
     except Exception as error:
         print("❌ Error during processing:", file=sys.stderr, flush=True)

@@ -61,7 +61,8 @@ def run_lilypad_focus_module(image_path: str, mode: str):
         command = [
             "lilypad",
             "run",
-            "github.com/ce20480/lilypad-module-focus-measure:8df261fd6670ce7eddc0f39a5a208f6f52a23e43",
+            "github.com/ce20480/lilypad-module-focus-measure:45157562074e3d8fb729279507a84356630a83c8",
+            "-i", f"INPUT={encoded}",
         ]
     else:
         raise ValueError(f"Invalid mode: {mode}")
