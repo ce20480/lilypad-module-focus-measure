@@ -5,6 +5,7 @@ import sys
 import uuid
 
 IMAGE_DEFAULT = "aviini/lilypad-module-focus-measure:v1"
+IMAGE_LILYPAD = "github.com/ce20480/lilypad-module-focus-measure:a8c88d55811aaf11441b44f36dd9b899e7c9dfb4"
 
 def run_local_docker(image_path: str):
     """
@@ -51,7 +52,7 @@ def build_and_push_image(embed_file: bool = False, file_path: str = "") -> str:
     but here it is for demonstration.
     """
     unique_tag = str(uuid.uuid4())[:8]
-    image_name = f"your-dockerhub-username/focus-measure:{unique_tag}"
+    image_name = f"aviini/lilypad-module-focus-measure:{unique_tag}"
 
     # We'll create a minimal Dockerfile “on the fly” if embed_file is True
     # Or you could just reuse an existing Dockerfile.
@@ -102,10 +103,10 @@ ENTRYPOINT ["python", "/app/src/run_inference.py"]
             )
         # Now copy the file into the build context
         # Just ensure the file is physically in the same directory, or pass a build context
-        cmd = [
-            "cp", file_path, os.path.basename(file_path)
-        ]
-        subprocess.run(cmd, check=True)
+        # cmd = [
+        #     "cp", file_path, os.path.basename(file_path)
+        # ]
+        # subprocess.run(cmd, check=True)
 
         # 2. Build using the newly created Dockerfile
         cmd = [
@@ -122,23 +123,34 @@ ENTRYPOINT ["python", "/app/src/run_inference.py"]
     subprocess.run(cmd_push, check=True)
 
     print(f"✅ Built & pushed image: {image_name}")
-    return image_name
+    if embed_file:
+        return image_name, file_path
+    else:
+        return image_name
 
 
-def run_lilypad(image_name: str):
+def run_lilypad(image_name: str, file_path: str=None):
     """
     Example: run the freshly built image on Lilypad.
     Typically you also pass -i arguments if needed, or rely on environment in the module.
     """
     print(f"🚀 Running Lilypad job with image: {image_name} ...")
 
-    cmd = [
-        "lilypad",
-        "run",
-        image_name,
-        # Optionally pass -i INPUT=someValue, if your run_inference.py expects environment
-        # e.g. "-i", 'MYENV="stuff"'
-    ]
+    if file_path:
+        cmd = [
+            "lilypad",
+            "run",
+            image_name,
+            # Optionally pass -i INPUT=someValue, if your run_inference.py expects environment
+            # e.g. "-i", 'MYENV="stuff"'
+            "-i", f'INPUT="app/src/images/{file_path}"',
+        ]
+    else:
+        cmd = [
+            "lilypad",
+            "run",
+            image_name,
+        ]
     result = subprocess.run(cmd, capture_output=True, text=True)
     print("Lilypad STDOUT:\n", result.stdout)
     print("Lilypad STDERR:\n", result.stderr)
@@ -169,11 +181,13 @@ def main():
     elif args.command == "build_lilypad":
         if args.embed_file:
             # embed the file into the container
-            new_image = build_and_push_image(embed_file=True, file_path=args.embed_file)
+            new_image, file_path = build_and_push_image(embed_file=True, file_path=args.embed_file)
+            print(f"🔨 New image: {new_image}")
+            print(f"🔨 File path: {file_path}")
+            # run_lilypad(IMAGE_LILYPAD, file_path)
         else:
             new_image = build_and_push_image(embed_file=False)
-        run_lilypad(new_image)
-
+            # run_lilypad(IMAGE_LILYPAD)
 
 if __name__ == "__main__":
     main()
