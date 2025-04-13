@@ -38,7 +38,7 @@ def run_lilypad_focus_module(image_path: str):
     command = [
         "lilypad",
         "run",
-        "github.com/ce20480/lilypad-module-focus-measure:21dee6d3dc1c412bab992a5f275dab6f4f0881f9",
+        "github.com/ce20480/lilypad-module-focus-measure:88afc52c52ebbf294c64e40edb6eb12714468894",
     ]
 
     print("🚀 Running Lilypad focus measure module...")
