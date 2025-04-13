@@ -93,8 +93,8 @@ def main():
         traceback.print_exc(file=sys.stderr)
         output["error"] = str(error)
 
-    os.makedirs("app/outputs", exist_ok=True)
-    output_path = "app/outputs/result.json"
+    os.makedirs("/outputs", exist_ok=True)
+    output_path = "/outputs/result.json"
 
     try:
         with open(output_path, "w") as file:
