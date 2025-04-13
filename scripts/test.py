@@ -61,7 +61,7 @@ def run_lilypad_focus_module(image_path: str, mode: str):
         command = [
             "lilypad",
             "run",
-            "github.com/ce20480/lilypad-module-focus-measure:2e036e9a915df37ab40a7e981e1c4f12854f5a95",
+            "github.com/ce20480/lilypad-module-focus-measure:8cd43e3cb118cc0bb4276ca5027216c0fed8cf02",
         ]
     else:
         raise ValueError(f"Invalid mode: {mode}")
